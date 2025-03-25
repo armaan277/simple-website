@@ -1,0 +1,54 @@
+1. Load Data into Power BI
+•	Open Power BI Desktop.
+•	Click Home > Get Data > Excel Workbook.
+•	Browse and select sales_data_sample.xlsx.
+•	Click Transform Data to open Power Query Editor instead of directly loading the data.
+
+•	2. Perform Data Transformations in Power Query
+A. Inspect and Rename Columns
+•	Check all column names and rename them to follow a clear naming convention (e.g., Order_Date instead of order date).
+B. Remove Unnecessary Columns
+•	If there are extra columns not needed for analysis, remove them to improve efficiency.
+
+C. Handle Missing Data
+•	Check for null values in key fields such as Order_ID, Customer_Name, Product_Code, etc.
+•	Apply one of the following:
+o	Use Remove Rows > Remove Blank Rows for completely empty records.
+o	Use Replace Values to fill nulls with "Unknown" (for text) or 0 (for numeric fields).
+o	Use Fill Down (for fields where previous values should be carried forward).
+
+D. Change Data Types
+•	Ensure that each column has the correct data type:
+o	Dates: Convert to Date type (Order_Date, Ship_Date).
+o	Numbers: Convert Quantity, Price, Total_Amount to Decimal Number or Whole Number.
+o	Text: Convert Customer_Name, Product_Name, Region to Text.
+
+E. Remove Duplicates
+•	Identify and remove duplicates based on Order_ID or Invoice_ID (whichever is the unique identifier).
+
+F. Standardize Text Formatting
+•	Convert text fields to Proper Case (e.g., Product Name, Customer Name):
+•	Text.Proper([Column_Name])
+•	Trim spaces from text fields to avoid mismatches:
+Text.Trim([Column_Name])
+
+3. Create Staging Tables
+•	Fact Table (FactSales):
+o	Keep transactional data such as Order_ID, Date, Product_Code, Quantity, Total_Sales.
+•	Dimension Tables:
+o	DimCustomers: Extract unique Customer_ID, Customer_Name, Region.
+o	DimProducts: Extract unique Product_Code, Product_Name, Category.
+o	DimDates: Create a Date Table if not present (Order_Date, Year, Month, Quarter).
+
+To create a Date Table in Power Query:
+1.	Go to New Source > Blank Query.
+2.	Open Advanced Editor and paste:
+3.	let
+4.	StartDate = #date(2020, 1, 1),
+5.	EndDate = #date(2030, 12, 31),
+6.	DateList = List.Dates(StartDate, Number.From(EndDate - StartDate) + 1, #duration(1, 0, 0, 0)),
+7.	DateTable = Table.FromList(DateList, Splitter.SplitByNothing(), {"Date"}),
+8.	ChangedType = Table.TransformColumnTypes(DateTable, {{"Date", type date}})
+9.	in
+10.	ChangedType
+11.	Click Close & Apply.
