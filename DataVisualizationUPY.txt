@@ -1,0 +1,92 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+#step 1: Load the csv data into a pandas DataFrame
+def load_data(csv_file):
+    try:
+        data=pd.read_csv(csv_file)
+        print("Data loaded successfully!")
+        return data
+    except Exception as e:
+        print(f"Error loading data: {e}")
+        return None
+#step 2: Perform basic data inspection
+def data_summary(data):
+    print("\nFirst 5 rows of the data:")
+    print(data.head()) #Displays the first 5 rows
+
+    print("\nData Structures:")
+    print(data.info()) #Get information on the DataFrame such as column type
+
+    print("\nStatistical summary of numeric columns:")
+    print(data.describe()) #Gives summary statistics for numeric columns
+
+#step 3:visualize the data
+
+#visualization 1: Total sales over Time
+def plot_sales_over_time(data):
+    # Convert 'Data' to datetime if it's not already in the correct format
+    data['Date'] = pd.to_datetime(data['Date'])
+
+    #Aggregate data by Date and calculate the total sales for each day
+    sales_by_date = data.groupby('Date')['Sales_Amount'].sum().reset_index()
+
+    plt.figure(figsize=(10,6))
+    sns.lineplot(x='Date',y='Sales_Amount',data=sales_by_date,marker='o')
+    plt.title('Total Sales over time')
+    plt.xlabel('Date')
+    plt.ylabel('Total Sales ($)')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+
+#Visualization 2: Sales Distribution by Region
+def plot_sales_by_region(data):
+    plt.figure(figsize=(10,6))
+    sns.boxplot(x='Region',y='Sales_Amount', data=data)
+    plt.title('Sales Distibution by Region')
+    plt.xlabel('Region')
+    plt.ylabel('Sales Amount ($)')
+    plt.tight_layout()
+    plt.show()
+
+#visualization 3: Sales vs Quantity Sold (Scatter plot)
+def plot_sales_vs_quantity(data):
+    plt.figure(figsize=(10,6))
+    sns.scatterplot(x='Quantity_Sold',y='Sales_Amount', data=data, hue='Product',palette='viridis')  # Replace with Quantity_Sold Order_Quantity
+    plt.title('Sales Amount vs Quantity Sold')
+    plt.xlabel('Quantity Sold')
+    plt.ylabel('Sales Amount ($)')
+    plt.tight_layout()
+    plt.show()
+#visualization 4: Top Products by Sales
+
+def plot_top_products_by_sales(data):
+    top_products = data.groupby('Product')['Sales_Amount'].sum().reset_index()
+    top_products = top_products.sort_values('Sales_Amount', ascending=False).head(10)
+
+    plt.figure(figsize=(10,6))
+    sns.barplot(x='Sales_Amount', y='Product', data=top_products, palette='Blues_d')
+    plt.title('Top 10 products by sales Amount')
+    plt.xlabel('Sales Amount ($)')
+    plt.ylabel('Product')
+    plt.tight_layout()
+    plt.show()
+
+# Main function to load data and generate visualizations
+def main():
+    csv_file = 'C:/Users/Administrator/Downloads/sales_data.csv' #Replace with your actual csv file path
+    data = load_data(csv_file)
+    if data is not None:
+          #Step 2: Data summary and inspection
+        data_summary(data)
+
+          #step 3: Data visualizations
+        plot_sales_over_time(data)
+        plot_sales_by_region(data)
+        plot_sales_vs_quantity(data)
+        plot_top_products_by_sales(data)
+#Entry point of the program
+if __name__=="__main__":
+    main()
